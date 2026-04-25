@@ -1,7 +1,8 @@
-from rest_framework import status, views, permissions
+from rest_framework import status, views, permissions, viewsets
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
+from .models import Address
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, AddressSerializer
 from .services import get_tokens_for_user
 
 class RegisterView(views.APIView):
@@ -52,3 +53,13 @@ class ForgotPinView(views.APIView):
             'message': 'Please contact the Super Admin to reset your PIN.',
             'contact': 'admin@aprosean.com, +91 9876543210'
         })
+
+class AddressViewSet(viewsets.ModelViewSet):
+    serializer_class = AddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

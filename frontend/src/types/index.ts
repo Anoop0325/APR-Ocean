@@ -4,6 +4,16 @@ export interface Category {
   description?: string;
 }
 
+export interface Address {
+  id: number;
+  full_name: string;
+  street_address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  is_default: boolean;
+}
+
 export interface User {
   id: number;
   phone_number: string;
