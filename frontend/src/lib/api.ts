@@ -4,9 +4,12 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
     ...options.headers,
   };
+
+  if (!(options.body instanceof FormData)) {
+    (headers as any)['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     (headers as any)['Authorization'] = `Bearer ${token}`;

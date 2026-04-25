@@ -3,4 +3,6 @@ __pycache__/
 *.pyc
 .DS_Store
 node_modules/
-.env
+db.sqlite3
+media/
+*.pySync

@@ -3,15 +3,11 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Trash2, Plus, Minus, CreditCard, Truck, ShoppingBag, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
-import { apiFetch } from '@/lib/api';
 
 export default function CartPage() {
-  const { cart, updateQuantity, fetchCart } = useCart();
+  const { cart, updateQuantity } = useCart();
   const { user } = useAuth();
   const router = useRouter();
-  const [paymentMethod, setPaymentMethod] = useState('COD');
-  const [isPlacing, setIsPlacing] = useState(false);
 
   if (!user) {
     return (
@@ -46,27 +42,6 @@ export default function CartPage() {
       </div>
     );
   }
-
-  const handleCheckout = async () => {
-    setIsPlacing(true);
-    try {
-      const res = await apiFetch('/orders/checkout/', {
-        method: 'POST',
-        body: JSON.stringify({ payment_method: paymentMethod }),
-      });
-      if (res.ok) {
-        const order = await res.json();
-        router.push(`/orders/${order.id}/success`);
-      } else {
-        const err = await res.json();
-        alert(err.error || 'Failed to place order');
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsPlacing(false);
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
@@ -147,36 +122,21 @@ export default function CartPage() {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Payment Method</p>
-              <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => setPaymentMethod('COD')}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentMethod === 'COD' ? 'border-primary bg-primary/5' : 'border-gray-100 text-gray-400'}`}
-                >
-                  <Truck size={20} />
-                  <span className="text-[10px] font-bold">COD</span>
-                </button>
-                <button 
-                  onClick={() => setPaymentMethod('ONLINE')}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentMethod === 'ONLINE' ? 'border-primary bg-primary/5' : 'border-gray-100 text-gray-400'}`}
-                >
-                  <CreditCard size={20} />
-                  <span className="text-[10px] font-bold">ONLINE</span>
-                </button>
-              </div>
-            </div>
-
             <button 
-              onClick={handleCheckout}
-              disabled={isPlacing}
-              className="w-full bg-primary text-white py-4 rounded-xl font-bold hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 disabled:opacity-50"
+              onClick={() => router.push('/checkout')}
+              className="w-full bg-primary text-white py-5 rounded-2xl font-bold hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 shadow-primary/20"
             >
-              {isPlacing ? "Processing..." : "Place Order"} <ArrowRight size={20} />
+              Checkout <ArrowRight size={20} />
             </button>
             
+            <div className="flex items-center justify-center gap-4 text-gray-300">
+               <Truck size={20} />
+               <CreditCard size={20} />
+               <ShoppingBag size={20} />
+            </div>
+
             <p className="text-[10px] text-center text-gray-400 px-4">
-              By placing the order, you agree to APR Osean Interprise's terms and privacy policy.
+              Step 1 of 2: Cart ➔ Checkout ➔ Order
             </p>
           </div>
         </div>

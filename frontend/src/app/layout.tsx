@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "Your trusted online pharmacy for authentic medicines and medical supplies.",
 };
 
+import Script from 'next/script';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +34,10 @@ export default function RootLayout({
             </div>
           </CartProvider>
         </AuthProvider>
+        <Script 
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );
