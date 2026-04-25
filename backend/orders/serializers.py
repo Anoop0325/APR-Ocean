@@ -34,3 +34,13 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'total_amount', 'status', 'payment_method', 'payment_status', 'created_at', 'items']
+
+class OrderAdminSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
+    user_email = serializers.ReadOnlyField(source='user.email')
+    user_phone = serializers.ReadOnlyField(source='user.phone_number')
+    user_full_name = serializers.ReadOnlyField(source='user.full_name')
+
+    class Meta:
+        model = Order
+        fields = '__all__'
