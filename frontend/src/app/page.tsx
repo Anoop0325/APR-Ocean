@@ -65,7 +65,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="medical-gradient rounded-[2rem] p-8 md:p-16 text-white text-center space-y-6 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-          <h2 className="text-3xl md:text-4xl font-bold relative z-10">Don't wait for your health.</h2>
+          <h2 className="text-3xl md:text-4xl font-bold relative z-10">Don&apos;t wait for your health.</h2>
           <p className="text-white/80 max-w-xl mx-auto relative z-10">
             Join thousands of satisfied customers who trust APR Osean Interprise for their medical needs.
           </p>

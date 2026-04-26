@@ -60,6 +60,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user) fetchCart();
     else clearCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (
