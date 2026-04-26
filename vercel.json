@@ -1,7 +1,0 @@
-{
-  "name": "apr-ocean-enterprise",
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "rootDirectory": "frontend"
-}
