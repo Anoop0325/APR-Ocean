@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (phone_number: string, pin: string) => Promise<boolean>;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  register: (name: string, phone_number: string, pin: string, email?: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,6 +61,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const register = async (name: string, phone_number: string, pin: string, email?: string) => {
+    try {
+      const res = await apiFetch('/auth/register/', {
+        method: 'POST',
+        body: JSON.stringify({ name, phone_number, pin, email }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('access_token', data.tokens.access);
+        localStorage.setItem('refresh_token', data.tokens.refresh);
+        setUser(data.user);
+        return true;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return false;
+  };
+
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -72,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth, register }}>
       {children}
     </AuthContext.Provider>
   );
