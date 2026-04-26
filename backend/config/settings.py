@@ -92,8 +92,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3'),
-        conn_max_age=600
+        conn_max_age=600,
+        conn_health_checks=True,
     )
+}
+
+# Add connection timeout to prevent hanging
+DATABASES['default']['OPTIONS'] = {
+    'connect_timeout': 10,
 }
 
 AUTH_PASSWORD_VALIDATORS = [
