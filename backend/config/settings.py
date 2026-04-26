@@ -9,7 +9,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-y7&0=tb!7wp17lof+$s60
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = [
+    'apr-ocean-backend.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    '*' # Keep wildcard for now to debug, but specific domains are safer
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -41,7 +46,24 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True  # In production, you might want to restrict this
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://apr-ocean-enterprise.vercel.app",
+    "http://localhost:3000",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]  # In production, you might want to restrict this
 
 TEMPLATES = [
     {
