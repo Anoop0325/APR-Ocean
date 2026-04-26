@@ -97,10 +97,11 @@ DATABASES = {
     )
 }
 
-# Add connection timeout to prevent hanging
-DATABASES['default']['OPTIONS'] = {
-    'connect_timeout': 10,
-}
+# Add connection timeout only for PostgreSQL (Render)
+if 'postgresql' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['OPTIONS'] = {
+        'connect_timeout': 10,
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
