@@ -8,11 +8,11 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   };
 
   if (!(options.body instanceof FormData)) {
-    (headers as any)['Content-Type'] = 'application/json';
+    (headers as Record<string, string>)['Content-Type'] = 'application/json';
   }
 
   if (token) {
-    (headers as any)['Authorization'] = `Bearer ${token}`;
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
