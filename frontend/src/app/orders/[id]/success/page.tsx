@@ -1,4 +1,5 @@
 'use client';
+import { API_URL } from '@/lib/api';
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { CheckCircle2, Download, Package, ArrowRight } from 'lucide-react';
@@ -16,11 +17,10 @@ export default function OrderSuccess() {
       
       <h1 className="text-4xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
       <p className="text-gray-500 mb-10">Your order <span className="font-bold text-gray-900">#{id}</span> has been successfully placed and is being processed.</p>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
         <button 
            className="flex items-center justify-center gap-2 p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all group"
-           onClick={() => window.open(`http://localhost:8000/api/orders/orders/${id}/invoice/`, '_blank')}
+           onClick={() => window.open(`${API_URL}/orders/orders/${id}/invoice/`, '_blank')}
         >
           <Download className="text-primary group-hover:scale-110 transition-transform" />
           <div className="text-left">
