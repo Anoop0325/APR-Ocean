@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Product, Category } from '@/types';
 import { apiFetch } from '@/lib/api';
-import { X, Loader2, Upload, Camera, Image as ImageIcon } from 'lucide-react';
+import { X, Loader2, Camera, Image as ImageIcon } from 'lucide-react';
 
 interface ProductModalProps {
   product?: Product | null;

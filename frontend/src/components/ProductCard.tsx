@@ -1,6 +1,7 @@
 'use client';
 import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
+import { getImageUrl } from '@/lib/api';
 import { Star, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 
@@ -12,7 +13,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <Link href={`/products/${product.id}`} className="relative aspect-square overflow-hidden bg-gray-50">
         {product.image ? (
           <img 
-            src={product.image} 
+            src={getImageUrl(product.image)} 
             alt={product.name} 
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />

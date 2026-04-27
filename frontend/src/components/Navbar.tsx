@@ -19,7 +19,7 @@ export default function Navbar() {
             <Pill size={24} />
           </div>
           <span className="font-bold text-xl tracking-tight text-primary hidden sm:block">
-            APR Osean
+            APR Ocean Enterprise
           </span>
         </Link>
 
@@ -37,6 +37,9 @@ export default function Navbar() {
         <div className="flex items-center gap-4 md:gap-6">
           <Link href="/products" className="text-gray-600 hover:text-primary font-medium text-sm">
             Shop
+          </Link>
+          <Link href="/about" className="text-gray-600 hover:text-primary font-medium text-sm">
+            About
           </Link>
 
           {user?.role !== 'USER' && user && (
@@ -56,13 +59,18 @@ export default function Navbar() {
 
           {user ? (
             <div className="flex items-center gap-3">
-              <Link href="/profile" className="flex items-center gap-1.5 text-gray-600 hover:text-primary transition-colors">
-                <User size={20} />
-                <span className="text-sm font-medium hidden lg:block">{user.name || user.phone_number}</span>
+              <Link 
+                href="/profile" 
+                className="flex items-center gap-1.5 text-gray-700 hover:text-primary transition-all duration-200 cursor-pointer group"
+              >
+                <div className="p-1.5 rounded-full bg-secondary group-hover:bg-primary/10 transition-colors">
+                  <User size={18} className="text-gray-600 group-hover:text-primary" />
+                </div>
+                <span className="text-sm font-semibold hidden lg:block tracking-tight">{user.name || user.phone_number}</span>
               </Link>
               <button 
                 onClick={logout}
-                className="text-xs text-red-500 font-medium border border-red-200 px-2 py-1 rounded hover:bg-red-50"
+                className="text-xs font-bold text-red-500 hover:text-white border border-red-200 hover:border-red-500 px-3 py-1.5 rounded-full transition-all duration-300 hover:bg-red-500 cursor-pointer shadow-sm hover:shadow-red-200"
               >
                 Logout
               </button>

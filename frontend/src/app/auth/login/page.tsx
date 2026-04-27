@@ -17,7 +17,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     const success = await login(phone, pin);
     if (success) {
       router.push('/');
@@ -80,7 +80,7 @@ export default function Login() {
               Forgot your PIN?
             </Link>
             <p className="text-sm text-gray-500">
-              Don't have an account? <Link href="/auth/register" className="text-primary font-bold hover:underline">Register</Link>
+              Don&apos;t have an account? <Link href="/auth/register" className="text-primary font-bold hover:underline">Register</Link>
             </p>
           </div>
         </form>

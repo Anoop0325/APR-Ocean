@@ -32,6 +32,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     
+    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=[('MALE', 'Male'), ('FEMALE', 'Female'), ('OTHER', 'Other')], blank=True, null=True)
+    dob = models.DateField(blank=True, null=True)
+    
     objects = UserManager()
 
     USERNAME_FIELD = 'phone_number'

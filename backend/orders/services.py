@@ -44,6 +44,8 @@ def place_order(user, address_id, payment_method='COD'):
     address = Address.objects.get(id=address_id, user=user)
     total_amount = sum(item.product.final_price * item.quantity for item in items)
     
+    print(f"DEBUG: Creating order for user {user.phone_number} with address ID {address_id}")
+    
     order = Order.objects.create(
         user=user,
         address=address,

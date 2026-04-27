@@ -1,5 +1,11 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
+export const getImageUrl = (path: string | null) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return `${API_URL.replace('/api', '')}${path}`;
+};
+
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   
@@ -8,11 +14,11 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   };
 
   if (!(options.body instanceof FormData)) {
-    (headers as any)['Content-Type'] = 'application/json';
+    (headers as Record<string, string>)['Content-Type'] = 'application/json';
   }
 
   if (token) {
-    (headers as any)['Authorization'] = `Bearer ${token}`;
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
@@ -26,3 +32,26 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
   return response;
 }
+
+export const authApi = {
+  getProfile: () => apiFetch('/auth/profile/'),
+  updateProfile: (data: any) => apiFetch('/auth/profile/', {
+    method: 'PATCH',
+    body: data instanceof FormData ? data : JSON.stringify(data),
+  }),
+};
+
+export const addressApi = {
+  getAddresses: () => apiFetch('/auth/addresses/'),
+  addAddress: (data: any) => apiFetch('/auth/addresses/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  deleteAddress: (id: number) => apiFetch(`/auth/addresses/${id}/`, {
+    method: 'DELETE',
+  }),
+  updateAddress: (id: number, data: any) => apiFetch(`/auth/addresses/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  }),
+};

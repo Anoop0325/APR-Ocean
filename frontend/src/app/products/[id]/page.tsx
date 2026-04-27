@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getImageUrl } from '@/lib/api';
 import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { ShoppingCart, Heart, Shield, RotateCcw, Truck, Star } from 'lucide-react';
@@ -31,7 +31,7 @@ export default function ProductDetail() {
         {/* Image Section */}
         <div className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm flex items-center justify-center">
           {product.image ? (
-            <img src={product.image} alt={product.name} className="max-h-[400px] object-contain" />
+            <img src={getImageUrl(product.image)} alt={product.name} className="max-h-[400px] object-contain" />
           ) : (
             <div className="text-gray-300 font-bold text-xl uppercase tracking-widest text-center">
               <div className="bg-secondary p-8 rounded-full mb-4 mx-auto w-32 h-32 flex items-center justify-center">No Image</div>

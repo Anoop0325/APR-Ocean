@@ -1,82 +1,116 @@
-import Link from 'next/link';
-import { ArrowRight, ShieldCheck, Truck, Clock } from 'lucide-react';
-import Image from 'next/image';
+'use client';
+import { useState, useEffect } from 'react';
+import { apiFetch } from '@/lib/api';
+import { Product, Category } from '@/types';
+import ProductCard from '@/components/ProductCard';
+import { Search, Filter, SlidersHorizontal } from 'lucide-react';
 
-export default function Home() {
+export default function ProductListing() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [sort, setSort] = useState('');
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [prodRes, catRes] = await Promise.all([
+        apiFetch(`/store/products/?search=${search}&category=${selectedCategory}&sort=${sort}`),
+        apiFetch('/store/categories/'),
+      ]);
+      
+      if (prodRes.ok) setProducts(await prodRes.json());
+      if (catRes.ok) setCategories(await catRes.json());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => fetchData(), 300);
+    return () => clearTimeout(timer);
+  }, [search, selectedCategory, sort]);
+
   return (
-    <div className="space-y-16 pb-16">
-      {/* Hero Section */}
-      <section className="relative h-[500px] flex items-center px-4 md:px-8 overflow-hidden bg-secondary/30">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12 w-full z-10">
-          <div className="space-y-6">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">
-              Genuine Medicines <br />
-              <span className="text-primary">Delivered with Care.</span>
-            </h1>
-            <p className="text-lg text-gray-600 max-w-md">
-              APR Osean Interprise provides authentic pharmaceutical products and healthcare supplies at your doorstep.
-            </p>
-            <div className="flex gap-4">
-              <Link 
-                href="/products" 
-                className="bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-primary-hover transition-all flex items-center gap-2 shadow-lg hover:shadow-primary/20"
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Filters Sidebar */}
+        <aside className="w-full md:w-64 space-y-8">
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Filter size={18} className="text-primary" /> Categories
+            </h3>
+            <div className="space-y-2">
+              <button 
+                onClick={() => setSelectedCategory('')}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedCategory === '' ? 'bg-primary text-white font-bold' : 'text-gray-600 hover:bg-secondary'}`}
               >
-                Shop Now <ArrowRight size={20} />
-              </Link>
-              <Link 
-                href="/about" 
-                className="bg-white border-2 border-primary text-primary px-8 py-4 rounded-full font-bold hover:bg-primary/5 transition-all"
-              >
-                Learn More
-              </Link>
+                All Categories
+              </button>
+              {categories.map((cat) => (
+                <button 
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id.toString())}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedCategory === cat.id.toString() ? 'bg-primary text-white font-bold' : 'text-gray-600 hover:bg-secondary'}`}
+                >
+                  {cat.name}
+                </button>
+              ))}
             </div>
           </div>
-          
-          <div className="hidden md:block relative">
-            <div className="absolute -top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
-            <div className="relative z-10 bg-white p-8 rounded-3xl shadow-2xl border border-gray-100 transform hover:scale-105 transition-transform duration-500">
-               {/* Note: In a real app we'd use a real image, using a placeholder for now */}
-               <div className="aspect-square bg-secondary rounded-2xl flex items-center justify-center text-primary font-bold text-2xl">
-                 Pharmacy <br/> Essentials
-               </div>
-            </div>
+
+          <div>
+             <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <SlidersHorizontal size={18} className="text-primary" /> Sort By
+            </h3>
+            <select 
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-lg py-2 px-3 text-sm focus:ring-2 ring-primary outline-none"
+            >
+              <option value="">Default</option>
+              <option value="price_low">Price: Low to High</option>
+              <option value="price_high">Price: High to Low</option>
+            </select>
           </div>
-        </div>
-      </section>
+        </aside>
 
-      {/* Features */}
-      <section className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { icon: <ShieldCheck className="text-primary" size={32} />, title: "100% Authentic", desc: "Sourced directly from verified distributors and manufacturers." },
-            { icon: <Truck className="text-primary" size={32} />, title: "Express Delivery", desc: "Get your medicines delivered within 24 hours in major cities." },
-            { icon: <Clock className="text-primary" size={32} />, title: "24/7 Support", desc: "Expert pharmacists available on call for your concerns." },
-          ].map((feature, i) => (
-            <div key={i} className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="mb-4 p-3 bg-secondary rounded-full">{feature.icon}</div>
-              <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
-              <p className="text-sm text-gray-500">{feature.desc}</p>
+        {/* Main Content */}
+        <main className="flex-1 space-y-6">
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Search by medicine name or brand..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-2xl py-4 px-6 pl-14 focus:ring-2 ring-primary outline-none shadow-sm transition-all"
+            />
+            <Search className="absolute left-6 top-4.5 text-gray-400" size={20} />
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse bg-gray-100 rounded-2xl h-64"></div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="medical-gradient rounded-[2rem] p-8 md:p-16 text-white text-center space-y-6 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-          <h2 className="text-3xl md:text-4xl font-bold relative z-10">Don't wait for your health.</h2>
-          <p className="text-white/80 max-w-xl mx-auto relative z-10">
-            Join thousands of satisfied customers who trust APR Osean Interprise for their medical needs.
-          </p>
-          <Link 
-            href="/auth/login" 
-            className="inline-block bg-white text-primary px-10 py-4 rounded-full font-bold hover:bg-gray-100 transition-all relative z-10 shadow-xl"
-          >
-            Create Your Account
-          </Link>
-        </div>
-      </section>
+          ) : products.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200">
+              <p className="text-gray-500">No products found matching your search.</p>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
