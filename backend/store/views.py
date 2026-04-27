@@ -9,6 +9,11 @@ class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
 
+class AdminCategoryCreateView(generics.CreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAdminUser]
+
 class ProductListView(generics.ListAPIView):
     serializer_class = ProductSerializer
     permission_classes = [permissions.AllowAny]

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Product, Category } from '@/types';
 import { apiFetch } from '@/lib/api';
-import { X, Loader2, Camera, Image as ImageIcon } from 'lucide-react';
+import { X, Loader2, Camera, Image as ImageIcon, Plus } from 'lucide-react';
 
 interface ProductModalProps {
   product?: Product | null;
@@ -17,6 +17,11 @@ export default function ProductModal({ product, categories, onClose, onSuccess }
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+  const [localCategories, setLocalCategories] = useState<Category[]>(categories);
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [categoryLoading, setCategoryLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -27,6 +32,31 @@ export default function ProductModal({ product, categories, onClose, onSuccess }
     gst_percent: '12',
     stock: '0',
   });
+
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    setCategoryLoading(true);
+    try {
+      const res = await apiFetch('/store/admin/categories/', {
+        method: 'POST',
+        body: JSON.stringify({ name: newCategoryName.trim() })
+      });
+      if (res.ok) {
+        const newCat = await res.json();
+        setLocalCategories([...localCategories, newCat]);
+        setFormData({ ...formData, category: newCat.id.toString() });
+        setShowNewCategory(false);
+        setNewCategoryName('');
+      } else {
+        alert('Failed to create category');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error creating category');
+    } finally {
+      setCategoryLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -143,19 +173,50 @@ export default function ProductModal({ product, categories, onClose, onSuccess }
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</label>
-                    <select 
-                      required
-                      value={formData.category}
-                      onChange={(e) => setFormData({...formData, category: e.target.value})}
-                      className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 ring-primary outline-none"
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</label>
+                      <button 
+                        type="button"
+                        onClick={() => setShowNewCategory(!showNewCategory)}
+                        className="text-[10px] font-black text-primary hover:underline flex items-center gap-1"
+                      >
+                        {showNewCategory ? <X size={10} /> : <Plus size={10} />}
+                        {showNewCategory ? 'Cancel' : 'New'}
+                      </button>
+                    </div>
+                    
+                    {showNewCategory ? (
+                      <div className="flex gap-2 animate-in slide-in-from-top-2 duration-200">
+                        <input 
+                          autoFocus
+                          placeholder="Category Name"
+                          value={newCategoryName}
+                          onChange={(e) => setNewCategoryName(e.target.value)}
+                          className="flex-1 bg-primary/5 border border-primary/20 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 ring-primary"
+                        />
+                        <button 
+                          type="button"
+                          disabled={categoryLoading || !newCategoryName.trim()}
+                          onClick={handleAddCategory}
+                          className="bg-primary text-white p-2 rounded-xl hover:bg-primary-hover disabled:opacity-50 transition-all"
+                        >
+                          {categoryLoading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                        </button>
+                      </div>
+                    ) : (
+                      <select 
+                        required
+                        value={formData.category}
+                        onChange={(e) => setFormData({...formData, category: e.target.value})}
+                        className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 ring-primary outline-none"
+                      >
+                        <option value="">Select Category</option>
+                        {localCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Brand</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Brand</label>
                     <input 
                       value={formData.brand}
                       onChange={(e) => setFormData({...formData, brand: e.target.value})}

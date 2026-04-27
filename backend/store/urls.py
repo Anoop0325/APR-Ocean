@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     CategoryListView, ProductListView, ProductDetailView, 
-    ReviewCreateView, ProductReviewListView
+    ReviewCreateView, ProductReviewListView, AdminCategoryCreateView
 )
 from .admin_views import InventoryStatusView, RatingsDashboardView
 from .admin_product_views import AdminProductViewSet
@@ -19,4 +19,5 @@ urlpatterns = [
     path('reviews/', ReviewCreateView.as_view(), name='review-create'),
     path('admin/inventory/', InventoryStatusView.as_view(), name='admin-inventory'),
     path('admin/ratings/', RatingsDashboardView.as_view(), name='admin-ratings'),
+    path('admin/categories/', AdminCategoryCreateView.as_view(), name='admin-category-create'),
 ]
