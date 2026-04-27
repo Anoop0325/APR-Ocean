@@ -26,3 +26,26 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
   return response;
 }
+
+export const authApi = {
+  getProfile: () => apiFetch('/auth/profile/'),
+  updateProfile: (data: any) => apiFetch('/auth/profile/', {
+    method: 'PATCH',
+    body: data instanceof FormData ? data : JSON.stringify(data),
+  }),
+};
+
+export const addressApi = {
+  getAddresses: () => apiFetch('/auth/addresses/'),
+  addAddress: (data: any) => apiFetch('/auth/addresses/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  deleteAddress: (id: number) => apiFetch(`/auth/addresses/${id}/`, {
+    method: 'DELETE',
+  }),
+  updateAddress: (id: number, data: any) => apiFetch(`/auth/addresses/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  }),
+};

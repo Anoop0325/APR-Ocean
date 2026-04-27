@@ -4,8 +4,8 @@ from .models import User, Address
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'phone_number', 'email', 'name', 'role']
-        read_only_fields = ['role']
+        fields = ['id', 'phone_number', 'email', 'name', 'role', 'profile_picture', 'gender', 'dob']
+        read_only_fields = ['role', 'phone_number']
 
 class RegisterSerializer(serializers.ModelSerializer):
     pin = serializers.CharField(write_only=True, min_length=4, max_length=4)
