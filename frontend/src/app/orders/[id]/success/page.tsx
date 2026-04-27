@@ -42,7 +42,7 @@ export default function OrderSuccess() {
       </div>
 
       <Link 
-        href="/profile" 
+        href="/orders" 
         className="inline-flex items-center gap-2 text-primary font-bold hover:underline"
       >
         Track Order Progress <ArrowRight size={18} />
