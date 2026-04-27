@@ -107,7 +107,7 @@ export default function CheckoutPage() {
       key: "rzp_test_placeholder",
       amount: order.total_amount * 100,
       currency: "INR",
-      name: "APR Osean Interprise",
+      name: "APR Ocean Enterprise",
       description: `Order #${order.id}`,
       order_id: order.razorpay_order_id,
       handler: async function(response: any) {

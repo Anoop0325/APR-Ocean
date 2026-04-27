@@ -57,7 +57,7 @@ export default function Register() {
             <Pill className="text-primary" size={32} />
           </div>
           <h2 className="text-3xl font-extrabold text-gray-900">Create Account</h2>
-          <p className="mt-2 text-sm text-gray-600">Join APR Osean Interprise today</p>
+          <p className="mt-2 text-sm text-gray-600">Join APR Ocean Enterprise today</p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

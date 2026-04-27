@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-gray-50 border-t border-gray-100 py-12 px-4 md:px-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1 md:col-span-1">
-          <h3 className="font-bold text-lg text-primary mb-4">APR Osean Interprise</h3>
+          <h3 className="font-bold text-lg text-primary mb-4">APR Ocean Enterprise</h3>
           <p className="text-gray-500 text-sm leading-relaxed">
             Leading pharmacy network providing authentic medicines and wellness products at your doorstep.
           </p>
@@ -39,7 +39,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-200 text-center text-gray-400 text-xs">
-        © {new Date().getFullYear()} APR Osean Interprise. All rights reserved.
+        © {new Date().getFullYear()} APR Ocean Enterprise. All rights reserved.
       </div>
     </footer>
   );

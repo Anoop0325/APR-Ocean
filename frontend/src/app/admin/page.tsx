@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
-import { Package, Star, AlertTriangle, MessageSquare, BarChart3, TrendingUp, Search, Plus, Edit2, ShoppingBag, ChevronDown, CheckCircle, Truck, Clock, ClipboardList } from 'lucide-react';
+import { Package, Star, AlertTriangle, MessageSquare, BarChart3, TrendingUp, Search, Plus, Edit2, ShoppingBag, ChevronDown, CheckCircle, Truck, Clock, ClipboardList, Trash2 } from 'lucide-react';
 import ProductModal from '@/components/ProductModal';
 import { Product, Category } from '@/types';
 
@@ -82,6 +82,20 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteProduct = async (productId: number) => {
+    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
+    try {
+      const res = await apiFetch(`/store/admin/products/${productId}/`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        fetchData();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const filteredOrders = useMemo(() => {
     if (!data?.orders) return [];
     return data.orders.filter((o: any) => 
@@ -113,7 +127,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-500">Overview of APR Osean Interprise operations</p>
+          <p className="text-gray-500">Overview of APR Ocean Enterprise operations</p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -274,12 +288,20 @@ export default function AdminDashboard() {
                            )}
                          </td>
                          <td className="px-8 py-4 text-center">
-                            <button 
-                              onClick={() => handleEdit(p.id)}
-                              className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
-                            >
-                              <Edit2 size={16} />
-                            </button>
+                            <div className="flex items-center justify-center gap-2">
+                              <button 
+                                onClick={() => handleEdit(p.id)}
+                                className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                              >
+                                <Edit2 size={16} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteProduct(p.id)}
+                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                          </td>
                        </tr>
                      ))

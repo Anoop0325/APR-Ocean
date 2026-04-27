@@ -19,7 +19,7 @@ export default function Navbar() {
             <Pill size={24} />
           </div>
           <span className="font-bold text-xl tracking-tight text-primary hidden sm:block">
-            APR Osean
+            APR Ocean Enterprise
           </span>
         </Link>
 

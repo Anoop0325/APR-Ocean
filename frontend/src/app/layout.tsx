@@ -10,7 +10,7 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "APR Osean Interprise | Pharmacy E-Commerce",
+  title: "APR Ocean Enterprise | Pharmacy E-Commerce",
   description: "Your trusted online pharmacy for authentic medicines and medical supplies.",
 };
 
