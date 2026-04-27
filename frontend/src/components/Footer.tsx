@@ -10,7 +10,7 @@ export default function Footer() {
             Leading pharmacy network providing authentic medicines and wellness products at your doorstep.
           </p>
         </div>
-        
+
         <div>
           <h4 className="font-semibold text-gray-800 mb-4 text-sm uppercase tracking-wider">Quick Links</h4>
           <ul className="space-y-2 text-sm text-gray-600">
@@ -33,13 +33,15 @@ export default function Footer() {
 
         <div>
           <h4 className="font-semibold text-gray-800 mb-4 text-sm uppercase tracking-wider">Contact Us</h4>
-          <p className="text-sm text-gray-600 mb-2">123 Health Street, Medical District</p>
-          <p className="text-sm text-gray-600 mb-2">+91 98765 43210</p>
-          <p className="text-sm text-gray-600">support@aprosean.com</p>
+          <p className="text-sm text-gray-600 mb-2">C-55, 1st Floor, DSIIDC Coplex, Kalyanpuri, Delhi-110091</p>
+          <p className="text-sm text-gray-600 mb-2">+91 9958705993 / +91 8851957122</p>
+          <p className="text-sm text-gray-600 mb-2">aproceanenterprise@gmail.com</p>
+          <p className="text-sm text-gray-600 mb-2">GST No. 07CUJPK1786N1ZX</p>
+          <p className="text-sm text-gray-600">License No. WLF21B2024BL001502</p>
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-200 text-center text-gray-400 text-xs">
-        © {new Date().getFullYear()} APR Ocean Enterprise. All rights reserved.
+        © {new Date().getFullYear()} APR Ocean Enterprise. All rights reserved. Made with ❤️ by Unix Labs.
       </div>
     </footer>
   );

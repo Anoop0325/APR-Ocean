@@ -32,10 +32,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     address_details = AddressSerializer(source='address', read_only=True)
+    user_email = serializers.ReadOnlyField(source='user.email')
+    user_phone = serializers.ReadOnlyField(source='user.phone_number')
+    user_full_name = serializers.ReadOnlyField(source='user.name')
 
     class Meta:
         model = Order
-        fields = ['id', 'total_amount', 'status', 'payment_method', 'payment_status', 'created_at', 'items', 'address', 'address_details']
+        fields = [
+            'id', 'total_amount', 'status', 'payment_method', 
+            'payment_status', 'created_at', 'delivered_at', 'items', 'address', 
+            'address_details', 'user_email', 'user_phone', 'user_full_name'
+        ]
 
 
 class OrderAdminSerializer(serializers.ModelSerializer):

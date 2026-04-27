@@ -31,6 +31,17 @@ class Order(models.Model):
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    delivered_at = models.DateTimeField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_order = Order.objects.get(pk=self.pk)
+            # If status just changed to DELIVERED, or it is DELIVERED and has no timestamp
+            if (old_order.status != 'DELIVERED' and self.status == 'DELIVERED') or \
+               (self.status == 'DELIVERED' and not self.delivered_at):
+                from django.utils import timezone
+                self.delivered_at = timezone.now()
+        super().save(*args, **kwargs)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')

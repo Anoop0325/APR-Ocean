@@ -20,7 +20,7 @@ export default function AdminDashboard() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [viewingOrder, setViewingOrder] = useState<any>(null);
@@ -31,23 +31,25 @@ export default function AdminDashboard() {
     }
   }, [user, authLoading]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    setData(null);
+  const fetchData = async (silent = false) => {
+    if (!silent) {
+      setLoading(true);
+      setData(null);
+    }
     try {
-      const endpoint = activeTab === 'inventory' ? '/store/admin/inventory/' : 
-                       activeTab === 'ratings' ? '/store/admin/ratings/' : '/orders/admin/dashboard/';
+      const endpoint = activeTab === 'inventory' ? '/store/admin/inventory/' :
+        activeTab === 'ratings' ? '/store/admin/ratings/' : '/orders/admin/dashboard/';
       const [dataRes, catRes] = await Promise.all([
         apiFetch(endpoint),
         apiFetch('/store/categories/')
       ]);
-      
+
       if (dataRes.ok) setData(await dataRes.json());
       if (catRes.ok) setCategories(await catRes.json());
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -57,7 +59,7 @@ export default function AdminDashboard() {
 
   const filteredInventory = useMemo(() => {
     if (!data?.products) return [];
-    return data.products.filter((p: any) => 
+    return data.products.filter((p: any) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.brand?.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -65,7 +67,7 @@ export default function AdminDashboard() {
 
   const filteredReviews = useMemo(() => {
     if (!data?.recent_reviews) return [];
-    return data.recent_reviews.filter((r: any) => 
+    return data.recent_reviews.filter((r: any) =>
       r.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.comment?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -100,7 +102,7 @@ export default function AdminDashboard() {
 
   const filteredOrders = useMemo(() => {
     if (!data?.orders) return [];
-    return data.orders.filter((o: any) => 
+    return data.orders.filter((o: any) =>
       o.id.toString().includes(searchTerm) ||
       o.user_full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       o.user_phone?.includes(searchTerm) ||
@@ -109,17 +111,39 @@ export default function AdminDashboard() {
   }, [data, searchTerm]);
 
   const handleUpdateOrderStatus = async (orderId: number, newStatus: string) => {
+    // Optimistic Update
+    const oldData = { ...data };
+    setData((prev: any) => ({
+      ...prev,
+      orders: prev.orders.map((o: any) =>
+        o.id === orderId ? { ...o, status: newStatus } : o
+      )
+    }));
+
     try {
       const res = await apiFetch(`/orders/admin/orders/${orderId}/`, {
         method: 'PATCH',
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
-        fetchData();
+        // Silent refresh to ensure stats are correct
+        fetchData(true);
+      } else {
+        // Rollback on error
+        setData(oldData);
       }
     } catch (e) {
       console.error(e);
+      setData(oldData);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const d = new Date(dateString);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   if (authLoading || !user || user.role === 'USER') return null;
@@ -131,22 +155,22 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-gray-500">Overview of APR Ocean Enterprise operations</p>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <div className="bg-white p-1 rounded-xl border border-gray-100 flex shadow-sm">
-            <button 
+            <button
               onClick={() => setActiveTab('inventory')}
               className={`px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'inventory' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
             >
               <Package size={18} /> Inventory
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('ratings')}
               className={`px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'ratings' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
             >
               <Star size={18} /> Ratings
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('orders')}
               className={`px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'orders' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
             >
@@ -155,7 +179,7 @@ export default function AdminDashboard() {
           </div>
 
           {activeTab === 'inventory' && (
-            <button 
+            <button
               onClick={() => { setEditingProduct(null); setShowModal(true); }}
               className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg hover:bg-primary-hover transition-all flex items-center gap-2 active:scale-95"
             >
@@ -167,8 +191,8 @@ export default function AdminDashboard() {
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 animate-pulse">
-           {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-gray-100 rounded-[2rem]"></div>)}
-           <div className="md:col-span-4 h-96 bg-gray-50 rounded-[2rem]"></div>
+          {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-gray-100 rounded-[2rem]"></div>)}
+          <div className="md:col-span-4 h-96 bg-gray-50 rounded-[2rem]"></div>
         </div>
       ) : data && (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -176,49 +200,49 @@ export default function AdminDashboard() {
           {activeTab === 'inventory' ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-primary/10 p-4 rounded-2xl text-primary"><Package size={24}/></div>
+                <div className="bg-primary/10 p-4 rounded-2xl text-primary"><Package size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Total Products</p><p className="text-2xl font-bold">{data.total_products}</p></div>
               </div>
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-orange-50 p-4 rounded-2xl text-orange-500"><AlertTriangle size={24}/></div>
+                <div className="bg-orange-50 p-4 rounded-2xl text-orange-500"><AlertTriangle size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Low Stock</p><p className="text-2xl font-bold">{data.low_stock_count}</p></div>
               </div>
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-red-50 p-4 rounded-2xl text-red-500"><AlertTriangle size={24}/></div>
+                <div className="bg-red-50 p-4 rounded-2xl text-red-500"><AlertTriangle size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Out of Stock</p><p className="text-2xl font-bold">{data.out_of_stock_count}</p></div>
               </div>
             </div>
           ) : activeTab === 'ratings' ? (
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-yellow-50 p-4 rounded-2xl text-yellow-500"><Star size={24}/></div>
+                <div className="bg-yellow-50 p-4 rounded-2xl text-yellow-500"><Star size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Overall Rating</p><p className="text-2xl font-bold">{data.overall_avg_rating} / 5</p></div>
               </div>
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-blue-50 p-4 rounded-2xl text-blue-500"><MessageSquare size={24}/></div>
+                <div className="bg-blue-50 p-4 rounded-2xl text-blue-500"><MessageSquare size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Recent Reviews</p><p className="text-2xl font-bold">{data.recent_reviews?.length || 0}</p></div>
               </div>
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-green-50 p-4 rounded-2xl text-green-500"><TrendingUp size={24}/></div>
+                <div className="bg-green-50 p-4 rounded-2xl text-green-500"><TrendingUp size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Top Products</p><p className="text-2xl font-bold">4.8+</p></div>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-primary/10 p-4 rounded-2xl text-primary"><ShoppingBag size={24}/></div>
+                <div className="bg-primary/10 p-4 rounded-2xl text-primary"><ShoppingBag size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Total Orders</p><p className="text-2xl font-bold">{data.total_orders}</p></div>
               </div>
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-orange-50 p-4 rounded-2xl text-orange-500"><Clock size={24}/></div>
+                <div className="bg-orange-50 p-4 rounded-2xl text-orange-500"><Clock size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Pending</p><p className="text-2xl font-bold">{data.pending_orders}</p></div>
               </div>
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-blue-50 p-4 rounded-2xl text-blue-500"><Truck size={24}/></div>
+                <div className="bg-blue-50 p-4 rounded-2xl text-blue-500"><Truck size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Shipped</p><p className="text-2xl font-bold">{data.shipped_orders}</p></div>
               </div>
               <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div className="bg-green-50 p-4 rounded-2xl text-green-500"><TrendingUp size={24}/></div>
+                <div className="bg-green-50 p-4 rounded-2xl text-green-500"><TrendingUp size={24} /></div>
                 <div><p className="text-xs text-gray-400 font-bold uppercase">Revenue</p><p className="text-2xl font-bold">₹{data.total_revenue}</p></div>
               </div>
             </div>
@@ -228,153 +252,160 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden">
             <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-bold text-lg">
-                {activeTab === 'inventory' ? 'Stock Management' : 
-                 activeTab === 'ratings' ? 'Recent Customer Reviews' : 'Order Management'}
+                {activeTab === 'inventory' ? 'Stock Management' :
+                  activeTab === 'ratings' ? 'Recent Customer Reviews' : 'Order Management'}
               </h3>
               <div className="relative">
                 <Search className="absolute left-3 top-2.5 text-gray-300" size={16} />
-                <input 
-                  type="text" 
-                  placeholder="Search..." 
+                <input
+                  type="text"
+                  placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg text-sm focus:ring-1 ring-primary outline-none" 
+                  className="pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg text-sm focus:ring-1 ring-primary outline-none"
                 />
               </div>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-gray-50 text-[10px] uppercase tracking-widest text-gray-400 font-bold">
                   {activeTab === 'inventory' ? (
                     <tr>
-                       <th className="px-8 py-4">Product Name</th>
-                       <th className="px-8 py-4">Brand</th>
-                       <th className="px-8 py-4">Current Stock</th>
-                       <th className="px-8 py-4">Status</th>
-                       <th className="px-8 py-4 text-center">Actions</th>
+                      <th className="px-8 py-4">Product Name</th>
+                      <th className="px-8 py-4">Brand</th>
+                      <th className="px-8 py-4">Current Stock</th>
+                      <th className="px-8 py-4">Status</th>
+                      <th className="px-8 py-4 text-center">Actions</th>
                     </tr>
                   ) : activeTab === 'ratings' ? (
-                     <tr>
-                       <th className="px-8 py-4">Customer</th>
-                       <th className="px-8 py-4">Product</th>
-                       <th className="px-8 py-4">Rating</th>
-                       <th className="px-8 py-4">Comment</th>
-                       <th className="px-8 py-4">Date</th>
-                     </tr>
-                   ) : (
-                     <tr>
-                       <th className="px-8 py-4">Order ID</th>
-                       <th className="px-8 py-4">Customer</th>
-                       <th className="px-8 py-4">Amount</th>
-                       <th className="px-8 py-4">Method</th>
-                       <th className="px-8 py-4">Delivery</th>
-                       <th className="px-8 py-4">Status</th>
-                       <th className="px-8 py-4 text-center">Actions</th>
-                     </tr>
-                   )}
+                    <tr>
+                      <th className="px-8 py-4">Customer</th>
+                      <th className="px-8 py-4">Product</th>
+                      <th className="px-8 py-4">Rating</th>
+                      <th className="px-8 py-4">Comment</th>
+                      <th className="px-8 py-4">Date</th>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <th className="px-8 py-4">Order ID</th>
+                      <th className="px-8 py-4">Customer</th>
+                      <th className="px-8 py-4">Amount</th>
+                      <th className="px-8 py-4">Method</th>
+                      <th className="px-8 py-4">Ordered On</th>
+                      <th className="px-8 py-4">Delivery</th>
+                      <th className="px-8 py-4">Status</th>
+                      <th className="px-8 py-4 text-center">Actions</th>
+                    </tr>
+                  )}
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-sm">
-                   {activeTab === 'inventory' ? (
-                     filteredInventory.map((p: any) => (
-                       <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                         <td className="px-8 py-4 font-bold text-gray-800">{p.name}</td>
-                         <td className="px-8 py-4 text-gray-500">{p.brand}</td>
-                         <td className="px-8 py-4 font-mono font-bold text-gray-900">{p.stock}</td>
-                         <td className="px-8 py-4">
-                           {p.stock === 0 ? (
-                             <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold">Out of Stock</span>
-                           ) : p.stock <= 10 ? (
-                             <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-bold">Low Stock</span>
-                           ) : (
-                             <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[10px] font-bold">Optimal</span>
-                           )}
-                         </td>
-                         <td className="px-8 py-4 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <button 
-                                onClick={() => handleEdit(p.id)}
-                                className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
-                              >
-                                <Edit2 size={16} />
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteProduct(p.id)}
-                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                         </td>
-                       </tr>
-                     ))
-                   ) : activeTab === 'ratings' ? (
-                     filteredReviews.map((r: any) => (
-                       <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                         <td className="px-8 py-4 font-bold text-primary">{r.user}</td>
-                         <td className="px-8 py-4">{r.product}</td>
-                         <td className="px-8 py-4">
-                           <div className="flex items-center gap-1 text-yellow-500 font-bold">
-                             <Star size={14} className="fill-current" /> {r.rating}
-                           </div>
-                         </td>
-                         <td className="px-8 py-4 text-gray-500 italic max-w-xs truncate">"{r.comment}"</td>
-                         <td className="px-8 py-4 text-gray-400 text-xs">{new Date(r.date).toLocaleDateString()}</td>
-                       </tr>
-                     ))
-                   ) : (
-                     filteredOrders.map((o: any) => (
-                       <tr key={o.id} className="hover:bg-gray-50 transition-colors">
-                         <td className="px-8 py-4 font-mono font-bold text-gray-900">#{o.id}</td>
-                         <td className="px-8 py-4">
-                            <div className="flex flex-col">
-                              <span className="font-bold text-gray-800">{o.user_full_name}</span>
-                              <span className="text-xs text-gray-400">{o.user_phone}</span>
-                            </div>
-                         </td>
-                         <td className="px-8 py-4 font-bold text-gray-900">₹{o.total_amount}</td>
-                         <td className="px-8 py-4">
-                            <span className={`px-2 py-1 rounded text-[10px] font-bold ${o.payment_method === 'ONLINE' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-600'}`}>
-                              {o.payment_method}
-                            </span>
-                         </td>
-                         <td className="px-8 py-4">
-                            {o.address_details ? (
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-bold text-gray-700">{o.address_details.city}</span>
-                                <span className="text-[10px] text-gray-400">{o.address_details.pincode}</span>
-                              </div>
-                            ) : (
-                              <span className="text-[10px] text-red-400 italic">No Address</span>
-                            )}
-                         </td>
-                         <td className="px-8 py-4">
-                           <select 
-                             value={o.status}
-                             onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value)}
-                             className={`text-[10px] font-bold px-3 py-1.5 rounded-full border-none outline-none appearance-none cursor-pointer transition-all
-                               ${o.status === 'DELIVERED' ? 'bg-green-100 text-green-600' : 
-                                 o.status === 'SHIPPED' ? 'bg-blue-100 text-blue-600' :
-                                 o.status === 'PACKED' ? 'bg-orange-100 text-orange-600' : 'bg-yellow-100 text-yellow-600'}`}
-                           >
-                             <option value="PENDING">PENDING</option>
-                             <option value="PACKED">PACKED</option>
-                             <option value="SHIPPED">SHIPPED</option>
-                             <option value="DELIVERED">DELIVERED</option>
-                           </select>
-                         </td>
-                         <td className="px-8 py-4 text-center">
-                            <button 
-                              title="View Details"
+                  {activeTab === 'inventory' ? (
+                    filteredInventory.map((p: any) => (
+                      <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-8 py-4 font-bold text-gray-800">{p.name}</td>
+                        <td className="px-8 py-4 text-gray-500">{p.brand}</td>
+                        <td className="px-8 py-4 font-mono font-bold text-gray-900">{p.stock}</td>
+                        <td className="px-8 py-4">
+                          {p.stock === 0 ? (
+                            <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold">Out of Stock</span>
+                          ) : p.stock <= 10 ? (
+                            <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-bold">Low Stock</span>
+                          ) : (
+                            <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[10px] font-bold">Optimal</span>
+                          )}
+                        </td>
+                        <td className="px-8 py-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleEdit(p.id)}
                               className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
-                              onClick={() => setViewingOrder(o)}
                             >
-                              <ClipboardList size={16} />
+                              <Edit2 size={16} />
                             </button>
-                         </td>
-                       </tr>
-                     ))
-                   )}
+                            <button
+                              onClick={() => handleDeleteProduct(p.id)}
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : activeTab === 'ratings' ? (
+                    filteredReviews.map((r: any) => (
+                      <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-8 py-4 font-bold text-primary">{r.user}</td>
+                        <td className="px-8 py-4">{r.product}</td>
+                        <td className="px-8 py-4">
+                          <div className="flex items-center gap-1 text-yellow-500 font-bold">
+                            <Star size={14} className="fill-current" /> {r.rating}
+                          </div>
+                        </td>
+                        <td className="px-8 py-4 text-gray-500 italic max-w-xs truncate">"{r.comment}"</td>
+                        <td className="px-8 py-4 text-gray-400 text-xs">{new Date(r.date).toLocaleDateString()}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    filteredOrders.map((o: any) => (
+                      <tr key={o.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-8 py-4 font-mono font-bold text-gray-900">#{o.id}</td>
+                        <td className="px-8 py-4">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-gray-800">{o.user_full_name}</span>
+                            <span className="text-xs text-gray-400">{o.user_phone}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-4 font-bold text-gray-900">₹{o.total_amount}</td>
+                        <td className="px-8 py-4">
+                          <span className={`px-2 py-1 rounded text-[10px] font-bold ${o.payment_method === 'ONLINE' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-600'}`}>
+                            {o.payment_method}
+                          </span>
+                        </td>
+                        <td className="px-8 py-4 text-xs font-bold text-gray-400">{formatDate(o.created_at)}</td>
+                        <td className="px-8 py-4">
+                          {o.address_details ? (
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-bold text-gray-700">{o.address_details.city}</span>
+                              <span className="text-[10px] text-gray-400">{o.address_details.pincode}</span>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] text-red-400 italic">No Address</span>
+                          )}
+                        </td>
+                        <td className="px-8 py-4">
+                          <div className="relative w-fit">
+                            <select
+                              value={o.status}
+                              onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value)}
+                              className={`text-[10px] font-black px-5 py-2.5 pr-10 rounded-full border-none outline-none appearance-none cursor-pointer transition-all shadow-sm ring-1 ring-inset
+                                ${o.status === 'DELIVERED' ? 'bg-green-50 text-green-700 ring-green-100 hover:bg-green-100' :
+                                  o.status === 'SHIPPED' ? 'bg-blue-50 text-blue-700 ring-blue-100 hover:bg-blue-100' :
+                                    o.status === 'PACKED' ? 'bg-orange-50 text-orange-700 ring-orange-100 hover:bg-orange-100' :
+                                      'bg-amber-50 text-amber-700 ring-amber-100 hover:bg-amber-100'}`}
+                            >
+                              <option value="PENDING">PENDING</option>
+                              <option value="PACKED">PACKED</option>
+                              <option value="SHIPPED">SHIPPED</option>
+                              <option value="DELIVERED">DELIVERED</option>
+                            </select>
+                            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-current opacity-70" />
+                          </div>
+                        </td>
+                        <td className="px-8 py-4 text-center">
+                          <button
+                            title="View Details"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary/5 text-primary hover:bg-primary hover:text-white rounded-xl transition-all font-black text-[11px] uppercase tracking-wider cursor-pointer active:scale-95 border border-primary/10 shadow-sm"
+                            onClick={() => setViewingOrder(o)}
+                          >
+                            <ClipboardList size={14} />
+                            <span>View</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -383,7 +414,7 @@ export default function AdminDashboard() {
       )}
 
       {showModal && (
-        <ProductModal 
+        <ProductModal
           product={editingProduct}
           categories={categories}
           onClose={() => setShowModal(false)}
@@ -392,7 +423,7 @@ export default function AdminDashboard() {
       )}
 
       {viewingOrder && (
-        <OrderDetailModal 
+        <OrderDetailModal
           order={viewingOrder}
           onClose={() => setViewingOrder(null)}
         />

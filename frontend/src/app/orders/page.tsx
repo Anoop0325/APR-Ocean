@@ -79,7 +79,7 @@ export default function MyOrdersPage() {
             <h3 className="text-xl font-bold text-gray-800">No orders found</h3>
             <p className="text-gray-500 max-w-xs mx-auto">Looks like you haven't placed any orders yet. Start shopping now!</p>
           </div>
-          <button 
+          <button
             onClick={() => router.push('/products')}
             className="bg-primary text-white px-10 py-4 rounded-2xl font-bold shadow-lg hover:bg-primary-hover transition-all active:scale-95 shadow-primary/20"
           >
@@ -89,7 +89,7 @@ export default function MyOrdersPage() {
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
-            <div 
+            <div
               key={order.id}
               onClick={() => setSelectedOrder(order)}
               className="bg-white rounded-[2.2rem] border border-gray-100 p-6 md:p-8 hover:border-primary/30 transition-all cursor-pointer group shadow-sm hover:shadow-xl hover:-translate-y-1 active:scale-[0.98]"
@@ -107,8 +107,8 @@ export default function MyOrdersPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-4 text-xs font-bold text-gray-400">
-                      <span className="flex items-center gap-1"><Clock size={14}/> {formatDate(order.created_at)}</span>
-                      <span className="flex items-center gap-1"><MapPin size={14}/> {order.address_details?.city || 'Delivery'}</span>
+                      <span className="flex items-center gap-1"><Clock size={14} /> {formatDate(order.created_at)}</span>
+                      <span className="flex items-center gap-1"><MapPin size={14} /> {order.address_details?.city || 'Delivery'}</span>
                     </div>
                   </div>
                 </div>
@@ -129,9 +129,9 @@ export default function MyOrdersPage() {
       )}
 
       {selectedOrder && (
-        <OrderDetailModal 
-          order={selectedOrder} 
-          onClose={() => setSelectedOrder(null)} 
+        <OrderDetailModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
         />
       )}
     </div>

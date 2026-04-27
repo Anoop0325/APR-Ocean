@@ -1,5 +1,5 @@
 'use client';
-import { X, User, Phone, Mail, MapPin, Package, CreditCard, Clock } from 'lucide-react';
+import { X, User, Phone, Mail, MapPin, Package, CreditCard, Clock, CheckCircle2 } from 'lucide-react';
 
 interface OrderDetailModalProps {
   order: any;
@@ -19,7 +19,7 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
         {/* Header */}
         <div className="px-8 py-7 bg-gray-50 border-b border-gray-100 flex items-start justify-between">
           <div className="space-y-1">
@@ -29,7 +29,7 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
               <p className="text-sm text-gray-500 font-mono font-bold tracking-tighter">#{order.id}</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="p-2.5 bg-white border border-gray-100 hover:bg-gray-50 hover:border-gray-200 rounded-2xl transition-all text-gray-400 hover:text-red-500 shadow-sm active:scale-90"
           >
@@ -84,13 +84,13 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
                 {order.address_details ? (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                       <p className="font-bold text-gray-800">{order.address_details.full_name}</p>
-                       <span className="text-[9px] bg-primary text-white px-2 py-0.5 rounded-lg font-black uppercase tracking-tighter">Ship To</span>
+                      <p className="font-bold text-gray-800">{order.address_details.full_name}</p>
+                      <span className="text-[9px] bg-primary text-white px-2 py-0.5 rounded-lg font-black uppercase tracking-tighter">Ship To</span>
                     </div>
                     <div className="h-px bg-gray-200/50 w-full"></div>
                     <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                      {order.address_details.street_address},<br/>
-                      {order.address_details.city}, {order.address_details.state}<br/>
+                      {order.address_details.street_address},<br />
+                      {order.address_details.city}, {order.address_details.state}<br />
                       <span className="text-gray-900 font-black mt-2 inline-block bg-white px-3 py-1 rounded-full border border-gray-100">PIN: {order.address_details.pincode}</span>
                     </p>
                   </div>
@@ -137,37 +137,44 @@ export default function OrderDetailModal({ order, onClose }: OrderDetailModalPro
 
           {/* Order Meta */}
           <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
-             <div className="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-               <p className="text-[10px] font-bold text-gray-400 uppercase mb-2.5">Status</p>
-               <span className={`text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest ring-1 ring-inset shadow-sm ${
-                 order.status === 'DELIVERED' ? 'bg-green-50 text-green-700 ring-green-100' : 
-                 order.status === 'PENDING' ? 'bg-amber-50 text-amber-700 ring-amber-100' : 'bg-blue-50 text-blue-700 ring-blue-100'
-               }`}>
-                 {order.status}
-               </span>
-             </div>
-             <div className="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm">
-               <p className="text-[10px] font-bold text-gray-400 uppercase mb-2.5">Payment</p>
-               <p className="text-[11px] font-black text-gray-700 uppercase tracking-tighter flex items-center gap-1.5">
-                  <CreditCard size={12} className="text-gray-400" /> {order.payment_method}
-               </p>
-             </div>
-             <div className="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm">
-               <p className="text-[10px] font-bold text-gray-400 uppercase mb-2.5">Date</p>
-               <p className="text-[11px] font-black text-gray-700 tracking-widest flex items-center gap-1.5">
-                  <Clock size={12} className="text-gray-400" /> {formatDate(order.created_at)}
-               </p>
-             </div>
-             <div className="bg-white p-5 rounded-[1.5rem] border border-primary/20 shadow-lg ring-2 ring-primary/5">
-               <p className="text-[10px] font-bold text-primary uppercase mb-2.5">Grand Total</p>
-               <p className="text-xl font-black text-primary tracking-tighter">₹{order.total_amount}</p>
-             </div>
+            <div className="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+              <p className="text-[10px] font-bold text-gray-400 uppercase mb-2.5">Delivery Status</p>
+              <span className={`text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest ring-1 ring-inset shadow-sm ${order.status === 'DELIVERED' ? 'bg-green-50 text-green-700 ring-green-100' :
+                order.status === 'PENDING' ? 'bg-amber-50 text-amber-700 ring-amber-100' : 'bg-blue-50 text-blue-700 ring-blue-100'
+                }`}>
+                {order.status}
+              </span>
+            </div>
+            <div className="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm">
+              <p className="text-[10px] font-bold text-gray-400 uppercase mb-2.5">Payment Menthod</p>
+              <p className="text-[11px] font-black text-gray-700 uppercase tracking-tighter flex items-center gap-1.5">
+                <CreditCard size={12} className="text-gray-400" /> {order.payment_method}
+              </p>
+            </div>
+            <div className="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm">
+              <p className="text-[10px] font-bold text-gray-400 uppercase mb-2.5">Ordered On</p>
+              <p className="text-[11px] font-black text-gray-700 tracking-widest flex items-center gap-1.5">
+                <Clock size={12} className="text-gray-400" /> {formatDate(order.created_at)}
+              </p>
+            </div>
+            {order.delivered_at && (
+              <div className="bg-green-50/30 p-5 rounded-[1.5rem] border border-green-100 shadow-sm">
+                <p className="text-[10px] font-bold text-green-600 uppercase mb-2.5">Delivered On</p>
+                <p className="text-[11px] font-black text-green-700 tracking-widest flex items-center gap-1.5">
+                  <CheckCircle2 size={12} className="text-green-500" /> {formatDate(order.delivered_at)}
+                </p>
+              </div>
+            )}
+            <div className="bg-white p-5 rounded-[1.5rem] border border-primary/20 shadow-lg ring-2 ring-primary/5">
+              <p className="text-[10px] font-bold text-primary uppercase mb-2.5">Grand Total</p>
+              <p className="text-xl font-black text-primary tracking-tighter">₹{order.total_amount}</p>
+            </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
-          <button 
+          <button
             onClick={onClose}
             className="bg-primary text-white px-10 py-4 rounded-[1.5rem] font-bold shadow-xl hover:bg-primary-hover transition-all active:scale-95 shadow-primary/20"
           >
