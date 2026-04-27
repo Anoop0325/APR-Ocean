@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { Package, Star, AlertTriangle, MessageSquare, BarChart3, TrendingUp, Search, Plus, Edit2, ShoppingBag, ChevronDown, CheckCircle, Truck, Clock, ClipboardList, Trash2 } from 'lucide-react';
 import ProductModal from '@/components/ProductModal';
+import OrderDetailModal from '@/components/OrderDetailModal';
 import { Product, Category } from '@/types';
 
 export default function AdminDashboard() {
@@ -22,6 +23,7 @@ export default function AdminDashboard() {
   
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [viewingOrder, setViewingOrder] = useState<any>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role === 'USER')) {
@@ -266,6 +268,7 @@ export default function AdminDashboard() {
                        <th className="px-8 py-4">Customer</th>
                        <th className="px-8 py-4">Amount</th>
                        <th className="px-8 py-4">Method</th>
+                       <th className="px-8 py-4">Delivery</th>
                        <th className="px-8 py-4">Status</th>
                        <th className="px-8 py-4 text-center">Actions</th>
                      </tr>
@@ -336,6 +339,16 @@ export default function AdminDashboard() {
                             </span>
                          </td>
                          <td className="px-8 py-4">
+                            {o.address_details ? (
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-gray-700">{o.address_details.city}</span>
+                                <span className="text-[10px] text-gray-400">{o.address_details.pincode}</span>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] text-red-400 italic">No Address</span>
+                            )}
+                         </td>
+                         <td className="px-8 py-4">
                            <select 
                              value={o.status}
                              onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value)}
@@ -352,11 +365,9 @@ export default function AdminDashboard() {
                          </td>
                          <td className="px-8 py-4 text-center">
                             <button 
-                              title="View Items"
+                              title="View Details"
                               className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
-                              onClick={() => {
-                                alert(`Items in Order #${o.id}:\n${o.items.map((i: any) => `${i.product_name} x ${i.quantity}`).join('\n')}`);
-                              }}
+                              onClick={() => setViewingOrder(o)}
                             >
                               <ClipboardList size={16} />
                             </button>
@@ -377,6 +388,13 @@ export default function AdminDashboard() {
           categories={categories}
           onClose={() => setShowModal(false)}
           onSuccess={() => fetchData()}
+        />
+      )}
+
+      {viewingOrder && (
+        <OrderDetailModal 
+          order={viewingOrder}
+          onClose={() => setViewingOrder(null)}
         />
       )}
     </div>

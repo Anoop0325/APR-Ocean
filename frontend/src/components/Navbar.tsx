@@ -38,6 +38,9 @@ export default function Navbar() {
           <Link href="/products" className="text-gray-600 hover:text-primary font-medium text-sm">
             Shop
           </Link>
+          <Link href="/about" className="text-gray-600 hover:text-primary font-medium text-sm">
+            About
+          </Link>
 
           {user?.role !== 'USER' && user && (
             <Link href="/admin" className="text-gray-600 hover:text-primary font-medium text-sm">

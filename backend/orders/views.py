@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from .serializers import CartSerializer, OrderSerializer, CartItemSerializer, OrderAdminSerializer
 from .services import get_or_create_cart, add_to_cart, update_cart_item, place_order, verify_payment
 from .models import Order
+from core.models import User, Address
 from core.permissions import IsAdminUser
 from .invoice_service import generate_invoice_pdf
 import io
@@ -62,8 +63,8 @@ class CheckoutView(views.APIView):
         try:
             order = place_order(request.user, address_id, payment_method)
             return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
-        except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except (ValueError, Address.DoesNotExist) as e:
+            return Response({'error': str(e) if isinstance(e, ValueError) else 'Invalid address selected'}, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyPaymentView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -97,7 +98,7 @@ class AdminOrderDashboardView(views.APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request):
-        orders = Order.objects.select_related('user').prefetch_related('items__product').order_by('-created_at')
+        orders = Order.objects.select_related('user', 'address').prefetch_related('items__product').order_by('-created_at')
         
         summary = {
             'total_orders': orders.count(),

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Cart, CartItem, Order, OrderItem
 from store.serializers import ProductSerializer
+from core.serializers import AddressSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
@@ -30,16 +31,19 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
+    address_details = AddressSerializer(source='address', read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'total_amount', 'status', 'payment_method', 'payment_status', 'created_at', 'items']
+        fields = ['id', 'total_amount', 'status', 'payment_method', 'payment_status', 'created_at', 'items', 'address', 'address_details']
+
 
 class OrderAdminSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     user_email = serializers.ReadOnlyField(source='user.email')
     user_phone = serializers.ReadOnlyField(source='user.phone_number')
-    user_full_name = serializers.ReadOnlyField(source='user.full_name')
+    user_full_name = serializers.ReadOnlyField(source='user.name')
+    address_details = AddressSerializer(source='address', read_only=True)
 
     class Meta:
         model = Order

@@ -1,11 +1,11 @@
 'use client';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/no-unescaped-entities */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getImageUrl } from '@/lib/api';
 import { Address as AddressType } from '@/types';
 import { 
   MapPin, Plus, CheckCircle2, ChevronRight, 
@@ -329,7 +329,7 @@ export default function CheckoutPage() {
                {cart.items.map(item => (
                  <div key={item.id} className="flex gap-4">
                     <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-[10px] font-bold text-gray-300 overflow-hidden shrink-0">
-                       {item.product.image ? <img src={item.product.image} className="w-full h-full object-cover"/> : 'IMG'}
+                       {item.product.image ? <img src={getImageUrl(item.product.image)} className="w-full h-full object-cover"/> : 'IMG'}
                     </div>
                     <div className="flex-1 min-w-0">
                        <p className="font-bold text-sm truncate">{item.product.name}</p>

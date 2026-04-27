@@ -3,6 +3,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Trash2, Plus, Minus, CreditCard, Truck, ShoppingBag, ArrowRight } from 'lucide-react';
+import { getImageUrl } from '@/lib/api';
 
 export default function CartPage() {
   const { cart, updateQuantity } = useCart();
@@ -56,7 +57,7 @@ export default function CartPage() {
             <div key={item.id} className="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 md:gap-6 shadow-sm">
               <div className="w-24 h-24 bg-gray-50 rounded-xl flex-shrink-0 flex items-center justify-center">
                  {item.product.image ? (
-                   <img src={item.product.image} className="w-full h-full object-cover rounded-xl" />
+                   <img src={getImageUrl(item.product.image)} className="w-full h-full object-cover rounded-xl" />
                  ) : (
                    <span className="text-gray-300 text-xs text-center px-2">{item.product.name}</span>
                  )}
