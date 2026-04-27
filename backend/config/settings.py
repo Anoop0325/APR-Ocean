@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-y7&0=tb!7wp17lof+$s60
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
-    'apr-ocean-backend.onrender.com',
+    'apr-ocean.onrender.com',
     'localhost',
     '127.0.0.1',
     '*' # Keep wildcard for now to debug, but specific domains are safer
